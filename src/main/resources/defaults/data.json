@@ -1,0 +1,26 @@
+{
+  "welcome":"Thanks for texting Westlake Fresh Up. Here is our current stock: ",
+  "spreadsheet-id":"1xQvAXJ8agHSQf6p2w3OodRvxjdVKiEJDet4HjD5zEuo",
+  "stock-users": [
+    "westlakefreshup@gmail.com",
+    "jason.p.mcelhenney@gmail.com",
+    "psamokhine@gmail.com"
+  ],
+  "locations": [
+    "Freshman Lunchroom",
+    "Chap Court",
+    "Commons",
+    "PAC"
+  ],
+  "times":[
+      "8:00-8:30",
+      "temp 1",
+      "temp 2"
+  ],
+  "merchants": [
+    {"name":"jason","number":"+15129238947"},
+    {"name":"peter","number":"+15122997121"},
+    {"name":"niko","number":"+15129627141"}
+  ]
+
+}
