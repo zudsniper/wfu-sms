@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <title>Payment Processing</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<h1 th:text="'Purchase for ' + ${number}"></h1>
+
+<h2><b>Your Cart</b></h2>
+<table th:if="${not #lists.isEmpty(cart)}">
+    <tr th:each="item : ${cart}" >
+        <td th:text="${item.name}"></td>
+        <td th:text="${item.price}"></td>
+        <td th:text="${item.quantity}"></td>
+    </tr>
+</table>
+<h2><b>Your Merchant</b></h2>
+<container th:if="${merchant!=null}">
+    <p th:text="'Name: ' + ${merchant.name}"></p>
+    <p th:text="'Number: ' + ${merchant.number}"></p>
+</container>
+<h2><b>Your Pickup</b></h2>
+<container th:if="${timeAndPlace!=null}">
+    <p th:text="'Time: ' + ${timeAndPlace.time}"></p>
+    <p th:text="'Place: ' + ${timeAndPlace.place}"></p>
+</container>
+
+<h1 th:text="'Your Total: $' + ${total}"/>
+
+<p><a th:href="${return_url}">Success</a></p>
+
+<p><a th:href="@{/purchase/cancel}">Cancel</a></p>
+
+<p><a th:href="@{/purchase/no_purchase}">No Purchase</a></p>
+</body>
+</html>

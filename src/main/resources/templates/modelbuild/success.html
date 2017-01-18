@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <title>Payment Success</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+    <h1>Purchase successful! Thanks!</h1>
+    <h2>Your Pickup</h2>
+    <p th:text="'Time: ' + ${time}"></p>
+    <p th:text="'Place: ' + ${place}"></p>
+    <h2>Your Merchant</h2>
+    <p th:text="'Name: ' + ${merchant_name}"></p>
+    <p th:text="'Number: ' + ${merchant_number}"></p>
+    <h2 th:text="'Total: $'+ ${total}"></h2>
+</body>
+</html>
