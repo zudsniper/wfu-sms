@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head lang="en">
@@ -33,5 +34,91 @@
 <p><a th:href="@{/purchase/cancel}">Cancel</a></p>
 
 <p><a th:href="@{/purchase/no_purchase}">No Purchase</a></p>
+</body>
+</html>-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head >
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+    <title>Payment Processing</title>
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+<nav class="grey lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Logo</a>
+
+
+
+    </div>
+</nav>
+<div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+        <br><br>
+        <h3 class="header center teal-text accent-3">Purchase successful! Thanks!</h3>
+        <div class="row center">
+            <h5 >Your Order</h5>
+            <h3 th:text="'Purchase for ' + ${number}"></h3>
+
+            <h5 class="header col s12 light">Your Cart</h5>
+            <table th:if="${not #lists.isEmpty(cart)}">
+                <tr th:each="item : ${cart}" >
+                    <td th:text="${item.name}"></td>
+                    <td th:text="${item.price}"></td>
+                    <td th:text="${item.quantity}"></td>
+                </tr>
+            </table>
+            <h5 class="header col s12 light">Your Merchant</h5>
+            <container th:if="${merchant!=null}">
+                <p th:text="'Name: ' + ${merchant.name}"></p>
+                <p th:text="'Number: ' + ${merchant.number}"></p>
+            </container>
+            <h5 class="header col s12 light">Your Pickup</h5>
+            <container th:if="${timeAndPlace!=null}">
+                <p th:text="'Time: ' + ${timeAndPlace.time}"></p>
+                <p th:text="'Place: ' + ${timeAndPlace.place}"></p>
+            </container>
+
+            <h4 th:text="'Your Total: $' + ${total}"/>
+        </div>
+
+        <br><br>
+
+    </div>
+</div>
+<div class="center">
+    <a th:href="@{/purchase/cancel}" class="waves-effect waves-light btn-large teal darken-2">Cancel</a>
+</div>
+
+
+<footer class="page-footer teal darken-2">
+    <div class="container">
+        <div class="row">
+            <div class="col l6 s12">
+                <h5 class="white-text">Westlake Fresh Up</h5>
+                <p class="grey-text text-lighten-4">Some Motto Shit</p>
+
+
+            </div>
+
+        </div>
+    </div>
+    <!--<div class="footer-copyright">
+      <div class="container">
+      Some subFooter Text
+      </div>
+    </div>-->
+</footer>
+
+
+<!--  Scripts-->
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="js/materialize.js"></script>
+<script src="js/init.js"></script>
+
 </body>
 </html>
