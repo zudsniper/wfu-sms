@@ -40,6 +40,9 @@ public class ModelController {
 		Purchase p = new Purchase("+model_testing");
 		p.setCart(new Cart());
 		p.getCart().add(new Item("test item",1,1));
+		p.getCart().add(new Item("test item 2", 1,1));
+		p.getCart().add(new Item("test item 3", 1,1));
+		p.getCart().add(new Item("test item 4", 1,1));
 		p.setTimeAndPlace(TimeAndPlace.create("temp 1","PAC"));
 		p.setMerchant(new Merchant("jaoson","+jaoson_number"));
 		p.setPaymentType(PaymentType.CARD);

@@ -82,6 +82,29 @@
         <div class="row center">
             <a th:href="@{/purchase/cancel}" class="waves-effect waves-light btn-large teal darken-2">Cancel</a>
         </div>
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+            <input type="hidden" name="cmd" value="_xclick"/>
+            <input type="hidden" name="business" value="MQW8XDWWAR87N"/>
+            <input type="hidden" name="amount" th:value="${total}"/>
+            <input type="hidden" name="item_name" th:value="${checkout_message}"/>
+            <input type="hidden" name="return" th:value="${return_url}"/>
+            <input type="hidden" name="cancel_return" th:value="${cancel_return_url}"/>
+            <input type="hidden" name="notify_url" th:value="${notify_url}"/>
+            <input type="hidden" name="lc" value="US"/>
+            <input type="hidden" name="button_subtype" value="services"/>
+            <input type="hidden" name="no_note" value="0"/>
+            <input type="hidden" name="cn" value="Add special instructions to the seller:"/>
+            <input type="hidden" name="no_shipping" value="1"/>
+            <input type="hidden" name="currency_code" value="USD"/>
+            <input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynowCC_LG.gif:NonHosted"/>
+            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"/>
+            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"/>
+        </form>
+        <div class="row center">
+            <a th:href="${return_url}" class="waves-effect waves-light btn-large teal darken-2">Success</a>
+        </div>
+
+
         <!--<div class="row left">
             <h4 class="white-text" th:text="'Your Total: $ ' + ${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}"/>
         </div>-->
