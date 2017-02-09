@@ -1,9 +1,10 @@
-package cc.holstr.wfu.google;
+package cc.holstr.wfu.google.stocking;
 
+import cc.holstr.wfu.google.GoogleSheetsManager;
+import cc.holstr.wfu.google.SheetsIO;
 import cc.holstr.wfu.model.Item;
 import cc.holstr.wfu.properties.Unpacker;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.batch.BatchRequest;
 import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -15,6 +16,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.Permission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -23,73 +26,35 @@ import java.util.*;
 /**
  * Created by jason on 1/6/17.
  */
-public class Stockist extends TreeMap<String, Item> {
+public class Stockist extends GoogleSheetsManager {
 
-	private Drive drive;
-	private SheetsIO sheetsIO;
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private String spreadsheetID;
-	private Credential credential;
+	private TreeMap<String, Item> stocks;
 
 	public Stockist() {
-		build();
+		build("wfu-stockist","credentials/WFU-stockist-credentials.json");
 	}
 
-	public void build() {
-		credential = authorise();
-		drive = initialiseDrive();
-		spreadsheetID = Unpacker.SPREADSHEET_ID;
-		sheetsIO = new SheetsIO(credential,spreadsheetID);
+	public void build(String appName, String credentialPath) {
+		super.build(appName, credentialPath, Unpacker.STOCK_SPREADSHEET_ID);
+		stocks = new TreeMap<>();
 		fromStockument();
 	}
 
-	public void add(Item item) {
-		super.put(item.getName(), item);
-	}
-
-	private Credential authorise() {
-		Credential credential = null;
-
-		Set<String> scopes = new HashSet<String>();
-		scopes.add("https://www.googleapis.com/auth/drive");
-		scopes.add("https://www.googleapis.com/auth/spreadsheets");
-
-		try {
-			credential = GoogleCredential.fromStream(this.getClass().getClassLoader().getResourceAsStream("credentials/WFU-stockist-credentials.json"))
-					.createScoped(scopes);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return credential;
-
-	}
-
-	private Drive initialiseDrive() {
-		try {
-			HttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-			JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-			Drive drive = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(
-					"wfu-stockist").build();
-			return drive;
-		} catch (GeneralSecurityException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+	public void add(Item item) {stocks.put(item.getName(), item);
 	}
 
 	public String listStock() {
 		String stock = "Item name   Price \n";
-		for(Item item : this.values()) {
+		for(Item item : stocks.values()) {
 			stock+=item.getName() + "     $" + item.getPrice() + "\n";
 		}
 		return stock;
 	}
 
 	public void fromStockument() {
-		clear();
+		stocks.clear();
 		String[][] contents = sheetsIO.readRange("stock",SheetsIO.getRangeFromDimension(sheetsIO.sheets.get("stock").getDimensions()));
 		for(int r = 1; r<contents.length; r++) {
 			add(new Item(contents[r][0],Double.parseDouble(contents[r][1]), Integer.parseInt(contents[r][2])));
@@ -99,7 +64,7 @@ public class Stockist extends TreeMap<String, Item> {
 	public void toStockument() {
 		String[][] contents = sheetsIO.readRange("stock",SheetsIO.getRangeFromDimension(sheetsIO.sheets.get("stock").getDimensions()));
 		for(int r = 1; r<contents.length; r++) {
-			Item item = get(contents[r][0]);
+			Item item = stocks.get(contents[r][0]);
 			if(item!=null) {
 				contents[r][2]=""+item.getQuantity();
 			}
@@ -184,4 +149,7 @@ public class Stockist extends TreeMap<String, Item> {
 
 	}
 
+	public TreeMap<String, Item> getStocks() {
+		return stocks;
+	}
 }

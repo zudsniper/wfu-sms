@@ -173,6 +173,17 @@ public class SheetsIO {
 		return vals;
 	}
 
+	public String[][] getContents(String sheet) {
+		return readRange(sheet,SheetsIO.getRangeFromDimension(sheets.get(sheet).getDimensions()));
+	}
+
+	public void setContents(String sheet, String[][] contents) {
+		writeRange(sheet,
+				SheetsIO.getRangeFromDimension(new Dimension(contents.length,getLongestRow(contents))),
+				"USER_ENTERED",
+				contents);
+	}
+
 	private static String parse(String value) {
 		StringBuilder str = new StringBuilder();
 		for (int i = 0; i < value.length(); i++) {
@@ -208,6 +219,26 @@ public class SheetsIO {
 		String range = "A1:";
 		range = range + getAlphabetValue(col) + row;
 		return range;
+	}
+
+	public static <T> int getLongestRow(T[][] data) {
+		int biggest = 0;
+		for (int i = 0; i < data.length; i++) {
+			if (data[i].length > biggest) {
+				biggest = data[i].length;
+			}
+		}
+		return biggest;
+	}
+
+	public static <T> int getLongestRow(List<List<T>> data) {
+		int biggest = 0;
+		for (int i = 0; i < data.size(); i++) {
+			if (data.get(i).size() > biggest) {
+				biggest = data.get(i).size();
+			}
+		}
+		return biggest;
 	}
 
 	private class GoogleJsonGenerator {

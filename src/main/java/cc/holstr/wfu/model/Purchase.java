@@ -1,6 +1,5 @@
 package cc.holstr.wfu.model;
 
-import cc.holstr.wfu.model.pickup.TimeAndPlace;
 import cc.holstr.wfu.sms.transaction.PaymentType;
 
 import java.util.Objects;
@@ -15,6 +14,7 @@ public class Purchase {
 	private Merchant merchant;
 	private Cart cart;
 	private PaymentType paymentType;
+	private long startingTime;
 
 	public Purchase(String number) {
 		build(number,null,null, new Cart(), null);
@@ -30,6 +30,7 @@ public class Purchase {
 		this.merchant = merchant;
 		this.cart = cart;
 		this.paymentType = paymentType;
+		startingTime = System.currentTimeMillis();
 	}
 
 	public boolean isFinal() {
@@ -74,6 +75,10 @@ public class Purchase {
 
 	public void setPaymentType(PaymentType paymentType) {
 		this.paymentType = paymentType;
+	}
+
+	public long millisSinceStart() {
+		return System.currentTimeMillis() - startingTime;
 	}
 
 	@Override

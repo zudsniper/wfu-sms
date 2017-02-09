@@ -9,12 +9,18 @@ public class StaticInfo {
 	@SerializedName("welcome")
 	@Expose
 	private String welcome;
-	@SerializedName("spreadsheet-id")
+	@SerializedName("stock-spreadsheet-id")
 	@Expose
-	private String spreadsheetId;
+	private String stockSpreadsheetId;
 	@SerializedName("stock-users")
 	@Expose
 	private List<String> stockUsers = null;
+	@SerializedName("stats-spreadsheet-id")
+	@Expose
+	private String statsSpreadsheetId;
+	@SerializedName("stats-users")
+	@Expose
+	private List<String> statsUsers = null;
 	@SerializedName("locations")
 	@Expose
 	private List<String> locations = null;
@@ -38,16 +44,16 @@ public class StaticInfo {
 		return this;
 	}
 
-	public String getSpreadsheetId() {
-		return spreadsheetId;
+	public String getStockSpreadsheetId() {
+		return stockSpreadsheetId;
 	}
 
-	public void setSpreadsheetId(String spreadsheetId) {
-		this.spreadsheetId = spreadsheetId;
+	public void setStockSpreadsheetId(String stockSpreadsheetId) {
+		this.stockSpreadsheetId = stockSpreadsheetId;
 	}
 
 	public StaticInfo withSpreadsheetId(String spreadsheetId) {
-		this.spreadsheetId = spreadsheetId;
+		this.stockSpreadsheetId = spreadsheetId;
 		return this;
 	}
 
@@ -103,4 +109,11 @@ public class StaticInfo {
 		return this;
 	}
 
+	public String getStatsSpreadsheetId() {
+		return statsSpreadsheetId;
+	}
+
+	public List<String> getStatsUsers() {
+		return statsUsers;
+	}
 }

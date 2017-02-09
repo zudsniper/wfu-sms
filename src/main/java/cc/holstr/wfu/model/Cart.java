@@ -1,5 +1,7 @@
 package cc.holstr.wfu.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 
 /**
@@ -25,6 +27,15 @@ public class Cart extends ArrayList<Item> {
 			contents+= item.getName() + "     $" + item.getPrice()+ "   "+item.getQuantity() + "\n";
 		}
 		return contents;
+	}
+
+	public Item getByName(String name) {
+		for(Item item : this) {
+			if(StringUtils.containsIgnoreCase(item.getName(),name)) {
+				return item;
+			}
+		}
+		return null;
 	}
 
 	@Override

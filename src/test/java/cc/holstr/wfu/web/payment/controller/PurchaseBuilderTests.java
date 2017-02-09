@@ -5,7 +5,7 @@ import cc.holstr.wfu.model.Cart;
 import cc.holstr.wfu.model.Item;
 import cc.holstr.wfu.model.Merchant;
 import cc.holstr.wfu.model.Purchase;
-import cc.holstr.wfu.model.pickup.TimeAndPlace;
+import cc.holstr.wfu.model.TimeAndPlace;
 import cc.holstr.wfu.properties.Unpacker;
 import cc.holstr.wfu.services.PurchaseBuilder;
 import cc.holstr.wfu.sms.transaction.PaymentType;

@@ -1,9 +1,8 @@
-package cc.holstr.wfu.model.pickup;
+package cc.holstr.wfu.model;
 
 import cc.holstr.wfu.properties.Unpacker;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by jason on 1/8/17.
@@ -16,7 +15,7 @@ public class TimeAndPlace {
 	private String time;
 	private String place;
 
-	private TimeAndPlace(String time, String place) {
+	public TimeAndPlace(String time, String place) {
 		this.time = time;
 		this.place = place;
 	}
@@ -52,6 +51,10 @@ public class TimeAndPlace {
 		else
 			return null;
 
+	}
+
+	public static TimeAndPlace testCreate(String time, String place) {
+		return new TimeAndPlace(time,place);
 	}
 
 	public static String list() {
