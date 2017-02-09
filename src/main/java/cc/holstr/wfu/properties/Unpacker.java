@@ -12,16 +12,23 @@ public class Unpacker {
 
 	private static final Gson gson = new Gson();
 
-	public static String SPREADSHEET_ID;
+	public static String STOCK_SPREADSHEET_ID;
+	public static String STATS_SPREADSHEET_ID;
 	public static StaticInfo STATIC_INFO;
 
 	public static void unpack() {
 		STATIC_INFO = gson.fromJson(new InputStreamReader(Unpacker.class.getClassLoader().getResourceAsStream("defaults/data.json")),StaticInfo.class);
-		String id = System.getenv("SPREADSHEET_ID");
-		if(id!=null) {
-			SPREADSHEET_ID = id;
+		String stock_spreadsheet_id = System.getenv("STOCK_SPREADSHEET_ID");
+		String stats_spreadsheet_id = System.getenv("STATS_SPREADSHEET_ID");
+		if(stock_spreadsheet_id!=null) {
+			STOCK_SPREADSHEET_ID = stock_spreadsheet_id;
 		} else {
-			SPREADSHEET_ID = STATIC_INFO.getSpreadsheetId();
+			STOCK_SPREADSHEET_ID = STATIC_INFO.getStockSpreadsheetId();
+		}
+		if(stats_spreadsheet_id!=null) {
+			STATS_SPREADSHEET_ID = stats_spreadsheet_id;
+		} else {
+			STATS_SPREADSHEET_ID = STATIC_INFO.getStatsSpreadsheetId();
 		}
 
 

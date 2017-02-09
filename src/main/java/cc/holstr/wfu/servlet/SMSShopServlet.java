@@ -3,8 +3,9 @@ package cc.holstr.wfu.servlet;
 import cc.holstr.util.RegExp;
 import cc.holstr.wfu.model.Item;
 import cc.holstr.wfu.model.Purchase;
-import cc.holstr.wfu.model.pickup.TimeAndPlace;
+import cc.holstr.wfu.model.TimeAndPlace;
 import cc.holstr.wfu.properties.Unpacker;
+import cc.holstr.wfu.services.MerchantValidator;
 import cc.holstr.wfu.services.PurchaseBuilder;
 import cc.holstr.wfu.sms.ErrorHandler;
 import cc.holstr.wfu.sms.transaction.*;
@@ -15,6 +16,9 @@ import com.twilio.twiml.TwiMLException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,24 +29,21 @@ import java.io.IOException;
 /**
  * Created by jason on 1/5/17.
  */
+@Component
 public class SMSShopServlet extends HttpServlet {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String myNumber = "+15122336569";
 
-	public final PurchaseBuilder service;
+	public final PurchaseBuilder builder;
 
-	public SMSInternalServlet smsInternalServlet;
-
+	@Autowired
 	public MerchantValidator merchantValidator;
-
 	//private PurchaseManager manager;
 
-	public SMSShopServlet(PurchaseBuilder service) {
-		this.service = service;
-		this.merchantValidator  = new MerchantValidator();
-		smsInternalServlet = new SMSInternalServlet(service, merchantValidator);
+	public SMSShopServlet(PurchaseBuilder builder) {
+		this.builder = builder;
 	}
 
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -66,8 +67,11 @@ public class SMSShopServlet extends HttpServlet {
 			logger.debug("param: " + param_name);
 		}*/
 
+		logger.debug("merchantValidator : "+merchantValidator);
+
 		if(SMSInternalServlet.myNumber.equals(toNumber)) {
-			smsInternalServlet.service(request,response);
+			logger.warn("internal handled incorrectly.");
+			//smsInternalServlet.builder(request,response);
 		} else {
 			logger.info("TO EXTERNAL: " + fromNumber);
 			if (manager.getPurchase() == null) {
@@ -91,7 +95,7 @@ public class SMSShopServlet extends HttpServlet {
 					message = "Resetting your user session. ";
 					manager.setPurchase(null);
 					//TODO: Remember to do this
-					//service.purchases.remove();
+					//builder.purchases.remove();
 				} else {
 					switch (step) {
 						case IN_PROGRESS: {
@@ -123,7 +127,7 @@ public class SMSShopServlet extends HttpServlet {
 								int quantity = 0;
 
 								purchaseloop:
-								for(Item item : manager.stockist.values()) {
+								for(Item item : manager.stockist.getStocks().values()) {
 									if(containsOnceIgnoreCase(body, item.getName())) {
 										name = item.getName();
 										String unparsedQuantity = RegExp.find(body,"((-)|())[0-9]+");
@@ -143,13 +147,18 @@ public class SMSShopServlet extends HttpServlet {
 									if (res == PurchaseResponse.NO_ITEM_FOUND) {
 										message = "No product named " + name + " found.";
 									} else if (res == PurchaseResponse.OUT_OF_STOCK) {
-										if (manager.stockist.get(name).getQuantity() < quantity) {
-											message = "sorry, we only have " + manager.stockist.get(name).getQuantity() + " " + name + ". You wanted " + quantity + ". ";
+										if (manager.stockist.getStocks().get(name).getQuantity() < quantity) {
+											message = "sorry, we only have " + manager.stockist.getStocks().get(name).getQuantity() + " " + name + ". You wanted " + quantity + ". ";
 										} else {
 											message = "product named " + name + " is out of stock.";
 										}
 									} else if(res == PurchaseResponse.ADDED) {
-										message = "Added " + quantity + " " + name + " to your cart.";
+										Item inCart = manager.getPurchase().getCart().getByName(name);
+										if(inCart==null) {
+											message = "Added " + quantity + " " + name + " to your cart.";
+										} else {
+											message = "Added " + quantity + " " + name + " to your cart. You now have " + inCart.getQuantity() + " in your cart.";
+										}
 									} else if(res == PurchaseResponse.REMOVED){
 										message = "Removed " + Math.abs(quantity) + " " + name + " from you cart.";
 									} else {
@@ -175,7 +184,7 @@ public class SMSShopServlet extends HttpServlet {
 										if(StringUtils.containsIgnoreCase(body, time)) {
 											logger.debug("time: " + time
 													+ "\n place: " + place);
-											timeAndPlace = TimeAndPlace.create(time,place);
+											timeAndPlace = new TimeAndPlace(time,place);
 											break timeplaceloop;
 										}
 									}
@@ -189,6 +198,11 @@ public class SMSShopServlet extends HttpServlet {
 								manager.getPurchase().setTimeAndPlace(timeAndPlace);
 								step = CheckoutStep.PAYMENT;
 								merchantValidator.askForMerchant(manager.getPurchase());
+								try {
+									merchantValidator.rejectTimer(manager.getPurchase());
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
 							}
 						}
 						break;
@@ -203,13 +217,15 @@ public class SMSShopServlet extends HttpServlet {
 						}
 						break;
 						case PAYMENT: {
-							Purchase p = service.purchases.get(fromNumber);
+							Purchase p = builder.purchases.get(fromNumber);
 							if(StringUtils.containsIgnoreCase(body, "cash")) {
 								message = "Ok, meet " + p.getMerchant().getName()
 										+ "\nat: " + p.getTimeAndPlace().getTime()
 										+ "\nin: " + p.getTimeAndPlace().getPlace()
-										+ "\n\nYour total is " + p.getCart().getTotal() + ". "
+										+ "\n\nYour total is $" + p.getCart().getTotal() + ". "
 										+ "\nSee you then!";
+								p.setPaymentType(PaymentType.CASH);
+								builder.statsManager.addPurchase(p);
 							} else {
 								paymentloop:
 								for (PaymentType type : PaymentType.values()) {
@@ -217,10 +233,10 @@ public class SMSShopServlet extends HttpServlet {
 										if (StringUtils.containsIgnoreCase(body, term)) {
   											p.setPaymentType(type);
 											message = "Click here to checkout: " +
-													service.generateURL(p);
+													builder.generateURL(p);
 											break paymentloop;
 										} else {
-											message = "No payment method for \""+body+",\" please try again.";
+											message = "No payment method for \""+body+"\" please try again.";
 										}
 									}
 								}

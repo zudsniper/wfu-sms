@@ -1,10 +1,16 @@
 {
   "welcome":"Thanks for texting Westlake Fresh Up. Here is our current stock: ",
-  "spreadsheet-id":"1xQvAXJ8agHSQf6p2w3OodRvxjdVKiEJDet4HjD5zEuo",
+  "stock-spreadsheet-id":"1xQvAXJ8agHSQf6p2w3OodRvxjdVKiEJDet4HjD5zEuo",
   "stock-users": [
     "westlakefreshup@gmail.com",
     "jason.p.mcelhenney@gmail.com",
-    "psamokhine@gmail.com"
+    "samokhine1@gmail.com"
+  ],
+  "stats-spreadsheet-id":"108CCHgtGpR6OnUseLt025ekLNxZ049K1H_YfXSn7SJk",
+  "stats-users": [
+    "westlakefreshup@gmail.com",
+    "jason.p.mcelhenney@gmail.com",
+    "samokhine1@gmail.com"
   ],
   "locations": [
     "Freshman Lunchroom",

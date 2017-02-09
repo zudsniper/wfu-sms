@@ -1,14 +1,13 @@
 package cc.holstr.wfu;
 
+import cc.holstr.wfu.google.statistics.StatsManager;
 import cc.holstr.wfu.properties.Unpacker;
+import cc.holstr.wfu.services.MerchantValidator;
 import cc.holstr.wfu.services.PurchaseBuilder;
+import cc.holstr.wfu.servlet.SMSErrorServlet;
 import cc.holstr.wfu.servlet.SMSInternalServlet;
 import cc.holstr.wfu.servlet.SMSShopServlet;
 import cc.holstr.wfu.web.payment.controller.PaymentController;
-import com.paypal.base.rest.APIContext;
-import com.paypal.base.rest.OAuthTokenCredential;
-import com.paypal.base.rest.PayPalRESTException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration;
@@ -17,12 +16,13 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.servlet.Servlet;
-import java.util.HashMap;
-import java.util.Map;
 
-@SpringBootApplication(exclude=DispatcherServletAutoConfiguration.class)
+@SuppressWarnings("ALL")
+@EnableAsync
+@SpringBootApplication(exclude=DispatcherServletAutoConfiguration.class, scanBasePackages = {"cc.holstr.wfu"})
 public class WfusmsInterfaceApplication {
 
 	/*@Bean(name="paymentServlet")
@@ -35,8 +35,6 @@ public class WfusmsInterfaceApplication {
 		servletRegistrationBean.setName("paymentServlet");
 		return servletRegistrationBean;
 	}*/
-
-	/**/
 
 	public static void main(String[] args) {
 		Unpacker.unpack();
@@ -51,70 +49,56 @@ public class WfusmsInterfaceApplication {
 						"server.ssl.key-store-password=Shoop5sh%",
 						"server.ssl.keyStoreType=PKCS12",
 						"server.ssl.keyAlias=tomcat",
-						"spring.thymeleaf.cache=false",
-						"paypal.mode=sandbox",
-						"paypal.client.app=AZvHPPpxD1_UFFYr-YxDiOxarrsYBOpvpbt-TN5-cqK0ZVwI2Qb5nX_byO86JuoqgsLkkjuoH4Jk234h",
-						"paypal.client.secret=ELlfnn2_uHDAFUaSBajUPTCmfCb_fyUwWvHmlxuO9xnau3f8KGOW42KEzE_vJb01iFD_up7OY5Q9sv80")
+						"spring.thymeleaf.cache=false")
 				.run(args);
 		//SpringApplication.run(WfusmsInterfaceApplication.class, args);
 	}
 
 	@Configuration
+	@EnableAsync
 	static class ApplicationConfiguration {
 
 		@Bean
 		public PurchaseBuilder purchaseBuilder() {
 			return new PurchaseBuilder();
 		}
+
 	}
 
 	@Configuration
+	@EnableAsync
 	@EnableAutoConfiguration
+	//@ComponentScan(basePackages = {"cc.holstr.wfu.servlet","cc.holstr.wfu.services"})
 	static class SMSServiceConfiguration {
 
+		@Bean
+		public MerchantValidator merchantValidator(PurchaseBuilder purchaseBuilder) {return new MerchantValidator(purchaseBuilder);}
+
 		@Bean(name="dispatcherServlet")
-		public Servlet getServlet(PurchaseBuilder service) {
-			return new SMSShopServlet(service);
+		public Servlet getServlet(PurchaseBuilder purchaseBuilder) {
+			return new SMSShopServlet(purchaseBuilder);
 		}
+
+		@Bean(name="internalServlet")
+		public ServletRegistrationBean getInternalServlet(PurchaseBuilder purchaseBuilder, MerchantValidator merchantValidator) {
+			ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new SMSInternalServlet(purchaseBuilder, merchantValidator), "/internal/*");
+			servletRegistrationBean.setName("internalServlet");
+			return servletRegistrationBean;}
+
+		@Bean(name="errorServlet")
+		public ServletRegistrationBean getErrorServlet(PurchaseBuilder purchaseBuilder) {
+			ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new SMSErrorServlet(purchaseBuilder), "/error/*");
+			servletRegistrationBean.setName("errorServlet");
+			return servletRegistrationBean;}
 	}
 
 	@Configuration
 	@EnableAutoConfiguration
 	static class PaymentServiceConfiguration {
 
-		/**
-		 * SRC: https://github.com/masasdani/paypal-springboot/
-		 */
-
 		@Bean
-		public PaymentController controller(PurchaseBuilder service) {
-			return new PaymentController(service);
-		}
-
-		@Value("${paypal.client.app}")
-		private String clientId;
-		@Value("${paypal.client.secret}")
-		private String clientSecret;
-		@Value("${paypal.mode}")
-		private String mode;
-
-		@Bean
-		public Map<String, String> paypalSdkConfig(){
-			Map<String, String> sdkConfig = new HashMap<>();
-			sdkConfig.put("mode", mode);
-			return sdkConfig;
-		}
-
-		@Bean
-		public OAuthTokenCredential authTokenCredential(){
-			return new OAuthTokenCredential(clientId, clientSecret, paypalSdkConfig());
-		}
-
-		@Bean
-		public APIContext apiContext() throws PayPalRESTException {
-			APIContext apiContext = new APIContext(authTokenCredential().getAccessToken());
-			apiContext.setConfigurationMap(paypalSdkConfig());
-			return apiContext;
+		public PaymentController controller(PurchaseBuilder purchaseBuilder) {
+			return new PaymentController(purchaseBuilder);
 		}
 	}
 }

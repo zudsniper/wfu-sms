@@ -1,20 +1,19 @@
 package cc.holstr.wfu.web.payment.controller;
 
+import cc.holstr.wfu.google.statistics.StatsManager;
 import cc.holstr.wfu.model.Purchase;
 import cc.holstr.wfu.services.PurchaseBuilder;
-import cc.holstr.wfu.servlet.SMSShopServlet;
 import cc.holstr.wfu.sms.transaction.PurchaseManager;
 import cc.holstr.wfu.web.payment.util.PurchaseURLCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 
 /**
  * Created by jason on 1/8/17.
@@ -25,19 +24,19 @@ public class PaymentController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private final PurchaseBuilder service;
+	private final PurchaseBuilder builder;
 
 	public static final String PAYPAL_SUCCESS_URL = "success";
 	public static final String PAYPAL_CANCEL_URL = "cancel";
 	public static final String PAYPAL_NOTIFY_URL = "notify";
 
-	public PaymentController(PurchaseBuilder service) {
-		this.service = service;
+	public PaymentController(PurchaseBuilder builder) {
+		this.builder = builder;
 	}
 
 	@GetMapping("{purchase_id}")
 	String purchase(@PathVariable String purchase_id, ModelMap model) {
-		Purchase p = service.purchases.get(purchase_id);
+		Purchase p = builder.purchases.get(purchase_id);
 		if(p!=null) {
 			model.put("purchase_id", purchase_id);
 			model.put("cart", p.getCart());
@@ -62,7 +61,7 @@ public class PaymentController {
 
 	@GetMapping("{purchase_id}/" + PAYPAL_CANCEL_URL)
 	public String cancelPay(@PathVariable String purchase_id, ModelMap model){
-		service.purchases.remove(purchase_id);
+		builder.purchases.remove(purchase_id);
 		return "cancel";
 	}
 
@@ -88,7 +87,8 @@ public class PaymentController {
 
 	@PostMapping("{purchase_id}/" + PAYPAL_NOTIFY_URL)
 	public void notifyPay(@PathVariable String purchase_id) {
-		service.purchases.remove(purchase_id);
+		builder.statsManager.addPurchase(builder.purchases.get(purchase_id));
+		builder.purchases.remove(purchase_id);
 		logger.info("SUCCESSFUL PURCHASE WITH UUID \n"+purchase_id);
 		PurchaseManager.stockist.toStockument();
 	}

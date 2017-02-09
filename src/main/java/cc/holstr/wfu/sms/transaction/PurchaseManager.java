@@ -1,8 +1,9 @@
 package cc.holstr.wfu.sms.transaction;
 
-import cc.holstr.wfu.google.Stockist;
+import cc.holstr.wfu.google.stocking.Stockist;
 import cc.holstr.wfu.model.Item;
 import cc.holstr.wfu.model.Purchase;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Created by jason on 1/7/17.
@@ -32,10 +33,11 @@ public class PurchaseManager {
 	}
 
 	public PurchaseResponse buy(String name, int quantity) {
-		if(stockist.get(name)!=null) {
-			Item stocked_item = stockist.get(name);
+		if(stockist.getStocks().get(name)!=null) {
+			Item stockedItem = stockist.getStocks().get(name);
 			for(Item item : getPurchase().getCart()) {
-				if(item.getName().equalsIgnoreCase(name)) {
+				if(StringUtils.containsIgnoreCase(item.getName(),name)) {
+					//if(inCart==null) {
 					if(quantity<0) {
 						int newVal = item.getQuantity()+quantity;
 						if(newVal > 0) {
@@ -49,9 +51,15 @@ public class PurchaseManager {
 					}
 				}
 			}
-			 if(stocked_item.getQuantity() >= quantity) {
-				purchase.getCart().add(new Item(name,stocked_item.getPrice(),quantity));
-				stocked_item.setQuantity(stocked_item.getQuantity()-quantity);
+			 if(stockedItem.getQuantity() >= quantity) {
+				Item item = getPurchase().getCart().getByName(name);
+				if(item==null) {
+					item = new Item(name, stockedItem.getPrice(), quantity);
+					purchase.getCart().add(item);
+				} else {
+					item.setQuantity(item.getQuantity()+quantity);
+				}
+				stockedItem.setQuantity(stockedItem.getQuantity() - quantity);
 				return PurchaseResponse.ADDED;
 			} else {
 				return PurchaseResponse.OUT_OF_STOCK;
