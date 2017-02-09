@@ -1,41 +1,4 @@
-<!--
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head lang="en">
-    <title>Payment Processing</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-</head>
-<body>
-<h1 th:text="'Purchase for ' + ${number}"></h1>
 
-<h2><b>Your Cart</b></h2>
-<table th:if="${not #lists.isEmpty(cart)}">
-    <tr th:each="item : ${cart}" >
-        <td th:text="${item.name}"></td>
-        <td th:text="${item.price}"></td>
-        <td th:text="${item.quantity}"></td>
-    </tr>
-</table>
-<h2><b>Your Merchant</b></h2>
-<container th:if="${merchant!=null}">
-    <p th:text="'Name: ' + ${merchant.name}"></p>
-    <p th:text="'Number: ' + ${merchant.number}"></p>
-</container>
-<h2><b>Your Pickup</b></h2>
-<container th:if="${timeAndPlace!=null}">
-    <p th:text="'Time: ' + ${timeAndPlace.time}"></p>
-    <p th:text="'Place: ' + ${timeAndPlace.place}"></p>
-</container>
-
-<h1 th:text="'Your Total: $' + ${total}"/>
-
-<p><a th:href="${return_url}">Success</a></p>
-
-<p><a th:href="@{/purchase/cancel}">Cancel</a></p>
-
-<p><a th:href="@{/purchase/no_purchase}">No Purchase</a></p>
-</body>
-</html>-->
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head >
@@ -44,9 +7,13 @@
     <title>Payment Processing</title>
 
     <!-- CSS  -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <!--<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
     <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>-->
 </head>
 <body>
 <nav class="grey lighten-1" role="navigation">
@@ -58,18 +25,32 @@
 </nav>
 <div class="section no-pad-bot" id="index-banner">
     <div class="container">
-        <br><br>
+        <br></br>
         <h3 class="header center teal-text accent-3">Purchase successful! Thanks!</h3>
         <div class="row center">
-            <h5 >Your Order</h5>
-            <h3 th:text="'Purchase for ' + ${number}"></h3>
+            <h4 >Your Order</h4>
+        </div>
+        <div class="col s4">
+
+            <h4 th:text="'Purchase for ' + ${number}"></h4>
 
             <h5 class="header col s12 light">Your Cart</h5>
-            <table th:if="${not #lists.isEmpty(cart)}">
+            <table class="responsive-table striped" th:if="${not #lists.isEmpty(cart)}">
+                <thead>
+                    <th data-field="item">Item</th>
+                    <th data-field="Price">Price</th>
+                    <th data-field="qty">Quantity</th>
+
+                    <th data-field="iTotal">Item Total</th>
+
+                </thead>
                 <tr th:each="item : ${cart}" >
                     <td th:text="${item.name}"></td>
-                    <td th:text="${item.price}"></td>
+                    <td>$ <span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 2, 'POINT')}">10.00</span></td>
+                    <!--<td th:text="${item.price}"></td>-->
                     <td th:text="${item.quantity}"></td>
+                    <td>$ <span th:text="${#numbers.formatDecimal(item.price*item.quantity, 0, 'COMMA', 2, 'POINT')}">10.00</span></td>
+                    <!--<td th:text="${item.price}*${item.quantity}"></td>-->
                 </tr>
             </table>
             <h5 class="header col s12 light">Your Merchant</h5>
@@ -83,16 +64,33 @@
                 <p th:text="'Place: ' + ${timeAndPlace.place}"></p>
             </container>
 
-            <h4 th:text="'Your Total: $' + ${total}"/>
-        </div>
 
-        <br><br>
+        </div>
+        <br></br>
+
+
+        <div class="row right">
+            <h4 th:text="'Your Total: $ ' + ${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}"/>
+        </div>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+
+
+
+        <div class="row center">
+            <a th:href="@{/purchase/cancel}" class="waves-effect waves-light btn-large teal darken-2">Cancel</a>
+        </div>
+        <!--<div class="row left">
+            <h4 class="white-text" th:text="'Your Total: $ ' + ${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}"/>
+        </div>-->
+        <br></br>
+        <br></br>
 
     </div>
 </div>
-<div class="center">
-    <a th:href="@{/purchase/cancel}" class="waves-effect waves-light btn-large teal darken-2">Cancel</a>
-</div>
+
 
 
 <footer class="page-footer teal darken-2">
