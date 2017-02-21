@@ -26,7 +26,7 @@
 <div class="section no-pad-bot" id="index-banner">
     <div class="container">
         <br></br>
-        <h3 class="header center teal-text accent-3">Purchase successful! Thanks!</h3>
+        <h3 class="header center teal-text accent-3">Checkout</h3>
         <div class="row center">
             <h4 >Your Order</h4>
         </div>
@@ -72,17 +72,15 @@
         <div class="row right">
             <h4 th:text="'Your Total: $ ' + ${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}"/>
         </div>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
 
 
 
-        <div class="row center">
+        <div class="row right">
+        <div class="col s3 ">
             <a th:href="@{/purchase/cancel}" class="waves-effect waves-light btn-large teal darken-2">Cancel</a>
         </div>
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"  class="col s5 ">
             <input type="hidden" name="cmd" value="_xclick"/>
             <input type="hidden" name="business" value="MQW8XDWWAR87N"/>
             <input type="hidden" name="amount" th:value="${total}"/>
@@ -97,11 +95,22 @@
             <input type="hidden" name="no_shipping" value="1"/>
             <input type="hidden" name="currency_code" value="USD"/>
             <input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynowCC_LG.gif:NonHosted"/>
-            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"/>
+
+            <input type="submit" value="Pay With Paypal"  class="waves-effect waves-light btn-large teal darken-2" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"/>
+
+
+
+<!--
+            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" class="waves-effect waves-light btn-large teal darken-2" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"/>
+
+
             <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"/>
+            -->
         </form>
-        <div class="row center">
+
+        <div class="col s2 ">
             <a th:href="${return_url}" class="waves-effect waves-light btn-large teal darken-2">Success</a>
+        </div>
         </div>
 
 
