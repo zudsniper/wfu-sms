@@ -69,18 +69,23 @@
         <br></br>
 
 
-        <div class="row right">
+        <div class="row right container">
             <h4 th:text="'Your Total: $ ' + ${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}"/>
         </div>
+        <br></br>
+
+        <br></br>
+        <br></br>
+        <br></br>
 
 
 
         <div class="row right">
-        <div class="col s3 ">
+        <div class="col s6 m3 l3">
             <a th:href="@{/purchase/cancel}" class="waves-effect waves-light btn-large teal darken-2">Cancel</a>
         </div>
 
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"  class="col s5 ">
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"  class="col s12 m6 l5">
             <input type="hidden" name="cmd" value="_xclick"/>
             <input type="hidden" name="business" value="MQW8XDWWAR87N"/>
             <input type="hidden" name="amount" th:value="${total}"/>
@@ -108,7 +113,7 @@
             -->
         </form>
 
-        <div class="col s2 ">
+        <div class="col s6 m3 l1">
             <a th:href="${return_url}" class="waves-effect waves-light btn-large teal darken-2">Success</a>
         </div>
         </div>
@@ -117,6 +122,8 @@
         <!--<div class="row left">
             <h4 class="white-text" th:text="'Your Total: $ ' + ${#numbers.formatDecimal(total, 0, 'COMMA', 2, 'POINT')}"/>
         </div>-->
+        <br></br>
+        <br></br>
         <br></br>
         <br></br>
 
