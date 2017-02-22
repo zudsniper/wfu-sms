@@ -31,14 +31,11 @@ public class MerchantValidator {
 
 	private final static long REJECT_INTERVAL = 180000; //180000;
 
-	public static List<Merchant> merchants;
+	private static List<Merchant> merchants;
 
 	private static HashMap<String, Merchant> merchantsMap;
 
-	public final PurchaseBuilder builder;
-
-	public MerchantValidator(PurchaseBuilder builder) {
-		this.builder = builder;
+	public MerchantValidator() {
 	}
 
 	public void askForMerchant(Purchase purchase){
@@ -120,5 +117,13 @@ public class MerchantValidator {
 			}
 		}
 		return merchantsMap;
+	}
+
+	public static List<Merchant> getMerchants() {
+		return merchants;
+	}
+
+	public static void setMerchants(List<Merchant> merchants) {
+		MerchantValidator.merchants = merchants;
 	}
 }

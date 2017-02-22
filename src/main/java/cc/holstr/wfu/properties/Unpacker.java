@@ -4,6 +4,7 @@ import cc.holstr.wfu.model.StaticInfo;
 import com.google.gson.Gson;
 
 import java.io.InputStreamReader;
+import java.util.HashMap;
 
 /**
  * Created by jason on 1/6/17.

@@ -72,7 +72,7 @@ public class WfusmsInterfaceApplication {
 	static class SMSServiceConfiguration {
 
 		@Bean
-		public MerchantValidator merchantValidator(PurchaseBuilder purchaseBuilder) {return new MerchantValidator(purchaseBuilder);}
+		public MerchantValidator merchantValidator() {return new MerchantValidator();}
 
 		@Bean(name="dispatcherServlet")
 		public Servlet getServlet(PurchaseBuilder purchaseBuilder) {
