@@ -80,12 +80,17 @@
 
 
 
-        <div class="row right">
-        <div class="col s6 m3 l3">
+        <div >
+        <div class="row col s12 m3 l2">
             <a th:href="@{/purchase/cancel}" class="waves-effect waves-light btn-large teal darken-2">Cancel</a>
         </div>
 
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"  class="col s12 m6 l5">
+
+
+
+            <div class="col s12 m6 l6 row ">
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" >
+
             <input type="hidden" name="cmd" value="_xclick"/>
             <input type="hidden" name="business" value="MQW8XDWWAR87N"/>
             <input type="hidden" name="amount" th:value="${total}"/>
@@ -101,8 +106,8 @@
             <input type="hidden" name="currency_code" value="USD"/>
             <input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynowCC_LG.gif:NonHosted"/>
 
-            <input type="submit" value="Pay With Paypal"  class="waves-effect waves-light btn-large teal darken-2" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"/>
-
+            <input type="submit" value="Pay With Paypal"  class="waves-effect waves-light btn-large teal darken-2" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"/></form>
+            </div>
 
 
 <!--
@@ -113,9 +118,9 @@
             -->
         </form>
 
-        <div class="col s6 m3 l1">
+        <!--<div class="col s6 m3 l1">
             <a th:href="${return_url}" class="waves-effect waves-light btn-large teal darken-2">Success</a>
-        </div>
+        </div>-->
         </div>
 
 
